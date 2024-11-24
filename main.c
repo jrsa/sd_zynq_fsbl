@@ -98,6 +98,8 @@
 *
 ******************************************************************************/
 
+#define FSBL_DEBUG_INFO
+
 /***************************** Include Files *********************************/
 
 #include "fsbl.h"
@@ -360,6 +362,10 @@ int main(void)
 	BootModeRegister = Xil_In32(BOOT_MODE_REG);
 	BootModeRegister &= BOOT_MODES_MASK;
 
+#if 1
+	BootModeRegister = JTAG_MODE;
+#endif
+
 	/*
 	 * QSPI BOOT MODE
 	 */
@@ -473,6 +479,7 @@ int main(void)
 		/** If bitstream was loaded in jtag boot mode prior to running FSBL */
 		if(RegVal & XDCFG_IXR_PCFG_DONE_MASK)
 		{
+      fsbl_printf(DEBUG_GENERAL,"PL is already programmed\r\n");
 #ifdef PS7_POST_CONFIG
 		ps7_post_config();
 		/*
@@ -480,7 +487,9 @@ int main(void)
 		 */
 		SlcrUnlock();
 #endif
-		}
+		} else {
+      fsbl_printf(DEBUG_GENERAL,"PL has NOT been programmed\r\n");
+    }
 		/*
 		 * Stop the Watchdog before JTAG handoff
 		 */
